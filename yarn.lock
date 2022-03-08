@@ -2992,10 +2992,10 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/tooltip/-/tooltip-3.0.1.tgz#bc7513c49344f8983c83ad8a0a45bf19470d9e78"
   integrity sha512-y5OG3lVidizxKrgvaXQrq9+7n6AxqPUoFDBdBEgrngeZnLmZirYgTqA9kB7EDDivStJhSdqLDRFn0ZrYpwdaNA==
 
-"@spectrum-css/typography@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@spectrum-css/typography/-/typography-3.0.1.tgz#957dafd9b18c314fa37a88b549042ba2175f5b3f"
-  integrity sha512-XyR68K2rIZX3u4j7HhMLOqLVHDJZcapp3XUqgYMzMWccBFleA0qPxKpfRWqVIA5DzTMSIw0wEcZPYKWFZ2e6dA==
+"@spectrum-css/typography@4.0.14":
+  version "4.0.14"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/typography/-/typography-4.0.14.tgz#de4a3532e528eadd0523ffbbd3e8996ecc894bf6"
+  integrity sha512-p/3oCLQ5D0IKt1igDgzd3pdrjlZSuPj0Tb/vai13MsfmTkxz1e+BwYTgPvxDi8OaBJ06ma78xTTf6sfjTV8ltA==
 
 "@spectrum-css/underlay@2.0.9":
   version "2.0.9"
