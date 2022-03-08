@@ -3002,10 +3002,10 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/underlay/-/underlay-2.0.9.tgz#fc10f971d1325cc844b727e6260f7217844060e8"
   integrity sha512-X86xd0PG4QobmUyXA90BFGnyygaI8kW64dA4ysf4z0cOvUWjNbAAl3a/DB/WRyrnp63Zqv83T/cgNbetagTbWg==
 
-"@spectrum-css/vars@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@spectrum-css/vars/-/vars-3.0.1.tgz#561fd69098f896a647242dd8d6108af603bfa31e"
-  integrity sha512-l4oRcCOqInChYXZN6OQhpe3isk6l4OE6Ys8cgdlsiKp53suNoQxyyd9p/eGRbCjZgH3xQ8nK0t4DHa7QYC0S6w==
+"@spectrum-css/vars@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/vars/-/vars-7.1.0.tgz#6531de43d3d0dfcc96ddda4d283f656e0efb63f6"
+  integrity sha512-hSn2ZZpvPOOzMCof9XWhaKNIs9yQfVkeUM0N6y99uz+9dvCyMrFlD2bvm+4IRB7yvu2xJQicd5vjVzbWyW/P6Q==
 
 "@spectrum-css/vars@^3.0.1":
   version "3.0.2"
