@@ -2987,10 +2987,10 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/textfield/-/textfield-3.0.1.tgz#e875b8e37817378ad08fc4af7d53026df38911e5"
   integrity sha512-MUV5q87CVxbkNdSNoxGrFbgyKc51ft/WWf3aVEoPdPw5yBnXqFe1w1YmAit5zYDOOhhs58sCLAlUcCMlOpkgrA==
 
-"@spectrum-css/tooltip@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@spectrum-css/tooltip/-/tooltip-3.0.1.tgz#bc7513c49344f8983c83ad8a0a45bf19470d9e78"
-  integrity sha512-y5OG3lVidizxKrgvaXQrq9+7n6AxqPUoFDBdBEgrngeZnLmZirYgTqA9kB7EDDivStJhSdqLDRFn0ZrYpwdaNA==
+"@spectrum-css/tooltip@3.1.13":
+  version "3.1.13"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/tooltip/-/tooltip-3.1.13.tgz#02db3376a89577e16820b3133cfa1961c3473d4a"
+  integrity sha512-Bao61MhYDHTfeVsm9fRpliiZS4zsuZ9Vrl8/HxqLqAKJ954Pe7MbjAFwvLRFUDcyTJSEuXegv13+ygB5xSeG+w==
 
 "@spectrum-css/typography@3.0.1":
   version "3.0.1"
