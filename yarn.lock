@@ -2885,10 +2885,10 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/actionbutton/-/actionbutton-1.0.1.tgz#9c75da37ea6915919fb574c74bd60dacc03b6577"
   integrity sha512-AUqtyNabHF451Aj9i3xz82TxS5Z6k1dttA68/1hMeU9kbPCSS4P6Viw3vaRGs9CSspuR8xnnhDgrq+F+zMy2Hw==
 
-"@spectrum-css/assetlist@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@spectrum-css/assetlist/-/assetlist-3.0.1.tgz#192f9ec29769600f1ab2c94f664ee5bb255bfb85"
-  integrity sha512-Ay/5dYWp9mb/EwqiI6ZLGpk7oybuohkd1DwC+aCnoathJ2QJrG5HOF0Db43j9EvxqFMXBROvKIRNMP1EVx2bLA==
+"@spectrum-css/assetlist@3.0.20":
+  version "3.0.20"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/assetlist/-/assetlist-3.0.20.tgz#af3e814ef5b121dd08d297f38d4a7667f6c2df08"
+  integrity sha512-hgAifR9pdWLwWBC3R1PV6qi+GB/ccYpmsj26x4tghY+oF8KNmMhYE0kkTUavbVEIxpTLF8TwzrOp7Y3bI5+ehA==
 
 "@spectrum-css/breadcrumb@3.0.1":
   version "3.0.1"
