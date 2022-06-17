@@ -2967,10 +2967,10 @@
   resolved "https://registry.yarnpkg.com/@spectrum-css/search/-/search-3.0.1.tgz#7c22821f29dd40dc1ce59fa88af47976cced47bc"
   integrity sha512-u2tJhaKvc6tZ2eg/SzzA5OpzHWT+q3Xi+wnqaAx9KSoxwuWBweyz8jKkYCMvXsWyMOC5hQGTbNDJ4ttc8myVMQ==
 
-"@spectrum-css/sidenav@3.0.1":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@spectrum-css/sidenav/-/sidenav-3.0.1.tgz#d2ce988085b9d0603f0dd0c61727010eb8601542"
-  integrity sha512-bCkVvDoXFx4uvAjDRP+u7pW/6SaxI4oSZ4yd8YadSGsyKd5pskBwimB+NwWL1OajQA6kvYK/3CyeFEyq1QcSFw==
+"@spectrum-css/sidenav@3.0.24":
+  version "3.0.24"
+  resolved "https://registry.yarnpkg.com/@spectrum-css/sidenav/-/sidenav-3.0.24.tgz#37ec2990a8a94ce9929ae30b3f0989e606b2ee8c"
+  integrity sha512-WADKJ6zr/WfUxXiUbG4BgZsLYqNHjHyuKCGg3ixhk3BT51Jpgm7sQ7YCdmbZGU/mZ3Mlbsc1ON+HENwRxmgelw==
 
 "@spectrum-css/table@3.0.1":
   version "3.0.1"
