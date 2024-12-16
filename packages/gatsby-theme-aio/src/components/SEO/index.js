@@ -14,20 +14,42 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 
-// TODO Define additional meta properties
-const SEO = ({ title, description }) => (
+// TODO: Revisit usage of keywords when/if it is replaced with category.
+const SEO = ({ title, description, keywords }) => (
   <Helmet>
+    <html lang="en" />
     {title && <title>{title}</title>}
     {description && <meta name="description" content={description} />}
+    {keywords && <meta name="keywords" content={keywords.join(', ')} />}
+    <meta property="og:image" content="https://developer.adobe.com/shared/images/adobe-social-share.png" />
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
     <link rel="icon" href="https://www.adobe.com/favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="https://www.adobe.com/favicon.ico" type="image/x-icon" />
+    {process.env.GATSBY_ADOBE_ANALYTICS_ENV && (
+      <script type="text/javascript">{`
+        window.marketingtech = {
+          'adobe': {
+            'launch': {
+              'property': 'global',
+              'environment': '${process.env.GATSBY_ADOBE_ANALYTICS_ENV}'
+            },
+            'analytics': {
+              'additionalAccounts': '${process.env.GATSBY_ADDITIONAL_ADOBE_ANALYTICS_ACCOUNTS}'
+            }
+          }
+        };
+      `}</script>
+    )}
+    {process.env.GATSBY_ADOBE_ANALYTICS_ENV && (
+      <script src="https://www.adobe.com/marketingtech/main.min.js" async></script>
+    )}
   </Helmet>
 );
 
 SEO.propTypes = {
   title: PropTypes.string,
-  description: PropTypes.string
+  description: PropTypes.string,
+  keywords: PropTypes.array
 };
 
 export { SEO };

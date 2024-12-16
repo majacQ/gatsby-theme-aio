@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useEffect, useState } from 'react';
 import { withPrefix } from 'gatsby';
 import { css } from '@emotion/react';
 import { connectToChild } from 'penpal';
@@ -19,54 +19,121 @@ import PropTypes from 'prop-types';
 import Context from '../Context';
 import { isExternalLink } from '../../utils';
 
-const Frame = ({ src, height = 'calc(100vh - var(--spectrum-global-dimension-size-800))' }) => {
+const Frame = ({ src, height = 'calc(100vh - var(--spectrum-global-dimension-size-800))', location }) => {
   const iframe = useRef(null);
-  const { ims } = useContext(Context);
+  // some strangeness with ims not being set within context???
+  const { ims, isLoadingIms } = useContext(Context);
+  let imsHack;
+  const [child, setChild] = useState(null);
+
+  // ensures connectToChild is called before the child calls connectToParent
+  const [connectionReady, setConnectionReady] = useState(false);
+
+  useEffect(() => {
+    if (child) {
+      if (iframe.current.clientHeight === 0) {
+        child.onHide();
+      } else {
+        child.onShow();
+      }
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setConnectionReady(false);
+    if (iframe != null && !isLoadingIms) {
+
+      // TODO: figure out why ims from context is not being updated so have to use a hacky solution like this
+      imsHack = window.adobeIMS;
+      const connection = createConnection();
+
+      return () => {
+        connection.destroy();
+      };
+    }
+  }, [iframe, isLoadingIms]);
+
+  const iframeSrc = isExternalLink(src) ? src : withPrefix(src);
+
+  const createConnection = () => {
+    const connection = connectToChild({
+      // The iframe to which a connection should be made
+      iframe: iframe.current,
+      // Manually set origin as auto-detection may fail, as the src of the iframe is set later
+      childOrigin: isExternalLink(src) ? new URL(src).origin : window.origin,
+      // Methods the parent is exposing to the child
+      methods: {
+        scrollTop(position = 0) {
+          if (document?.scrollingElement) {
+            document.scrollingElement.scrollTop = position;
+          }
+        },
+        getURL() {
+          return window?.location?.href;
+        },
+        setURL(url) {
+          if (window?.location) {
+            window.location = url;
+          }
+        },
+        setHeight(height) {
+          iframe.current.style.height = height;
+        },
+        getIMSAccessToken() {
+          if (imsHack?.isSignedInUser()) {
+            return imsHack.getAccessToken();
+          }
+
+          return null;
+        },
+        getIMSProfile() {
+          if (imsHack?.isSignedInUser()) {
+            return imsHack.getProfile();
+          }
+
+          return null;
+        },
+        signIn() {
+          if (imsHack && !imsHack.isSignedInUser()) {
+            imsHack.signIn();
+          }
+        },
+        signOut() {
+          if (imsHack && imsHack.isSignedInUser()) {
+            imsHack.signOut();
+          }
+        },
+        getIMSClientId() {
+          if (imsHack) {
+            return imsHack.adobeIdData.client_id;
+          } else {
+            return null;
+          }
+        }
+      }
+    });
+
+    connection.promise.then((child) => {
+      if (iframe.current.clientHeight === 0) {
+        child.onHide();
+      } else {
+        child.onShow();
+      }
+      setChild(child);
+    });
+
+    // Notify that the connection is ready and the iframe src may be set
+    setConnectionReady(true);
+
+    return connection;
+  };
 
   return (
     <>
       <iframe
+        title="Main content"
         ref={iframe}
-        src={isExternalLink(src) ? src : withPrefix(src)}
-        onLoad={() => {
-          connectToChild({
-            // The iframe to which a connection should be made
-            iframe: iframe.current,
-            // Methods the parent is exposing to the child
-            methods: {
-              getURL() {
-                return location.href;
-              },
-              setHeight(height) {
-                iframe.current.style.height = height;
-              },
-              getIMSAccessToken() {
-                if (ims?.isSignedInUser()) {
-                  return ims.getAccessToken();
-                }
-
-                return null;
-              },
-              getIMSProfile() {
-                if (ims?.isSignedInUser()) {
-                  return ims.getProfile();
-                }
-
-                return null;
-              },
-              signIn() {
-                if (ims && !ims.isSignedInUser()) {
-                  ims.signIn();
-                }
-              },
-              signOut() {
-                if (ims && ims.isSignedInUser()) {
-                  ims.signOut();
-                }
-              }
-            }
-          });
-        }}
+        src={connectionReady ? iframeSrc : ''}
         css={css`
           display: block;
           height: ${height};
@@ -74,7 +141,6 @@ const Frame = ({ src, height = 'calc(100vh - var(--spectrum-global-dimension-siz
           border: none;
         `}
       />
-
       <Footer />
     </>
   );
@@ -82,7 +148,8 @@ const Frame = ({ src, height = 'calc(100vh - var(--spectrum-global-dimension-siz
 
 Frame.propTypes = {
   src: PropTypes.string,
-  height: PropTypes.string
+  height: PropTypes.string,
+  location: PropTypes.object
 };
 
 export default Frame;

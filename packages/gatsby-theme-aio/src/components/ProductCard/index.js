@@ -10,12 +10,13 @@
  * governing permissions and limitations under the License.
  */
 
-import React, { useEffect, cloneElement } from 'react';
+import React, { cloneElement, useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { HeroButtons } from '../Hero';
+import classNames from "classnames";
 import '@spectrum-css/typography';
 import '@spectrum-css/card';
-import { DESKTOP_SCREEN_WIDTH, TABLET_SCREEN_WIDTH } from '../../utils';
+import { DESKTOP_SCREEN_WIDTH, TABLET_SCREEN_WIDTH, MOBILE_SCREEN_WIDTH } from '../../utils';
 import PropTypes from 'prop-types';
 
 const counter = {
@@ -25,13 +26,15 @@ const counter = {
 };
 const alignMapping = ['flex-start', 'flex-end'];
 
-const ProductCard = ({ theme = 'lightest', width = '100%', icon, heading, text, buttons }) => {
-  let columns = 100 / parseFloat(width);
+const ProductCard = ({ theme = 'lightest', width = '100%', icon, heading, text, buttons, className }) => {
+  let initColumns = 100 / parseFloat(width);
 
   if (width === '33%') {
     width = `${(100 / 3).toFixed(2)}%`;
-    columns = 3;
+    initColumns = 3;
   }
+
+  const [columns] = useState(initColumns);
 
   useEffect(() => {
     return () => {
@@ -39,7 +42,7 @@ const ProductCard = ({ theme = 'lightest', width = '100%', icon, heading, text, 
         counter[columns]--;
       }
     };
-  });
+  }, [columns]);
 
   if (typeof counter[columns] !== 'undefined') {
     counter[columns]++;
@@ -49,10 +52,10 @@ const ProductCard = ({ theme = 'lightest', width = '100%', icon, heading, text, 
   if (columns === 2 || columns === 3) {
     alignment = alignMapping[counter[columns] % columns] || 'center';
   }
-
+  const MIN_MOBILE_SCREEN_WIDTH = '320px'
   return (
     <section
-      className={`spectrum--${theme}`}
+      className={classNames(className, `spectrum--${theme}`)}
       css={css`
         display: inline-flex;
         flex-direction: column;
@@ -61,21 +64,21 @@ const ProductCard = ({ theme = 'lightest', width = '100%', icon, heading, text, 
         padding: var(--spectrum-global-dimension-size-400) 0;
         background: var(--spectrum-global-color-gray-100);
 
-        @media screen and (max-width: ${TABLET_SCREEN_WIDTH}) {
+        @media screen and (min-width: ${MIN_MOBILE_SCREEN_WIDTH}) and (max-width: ${MOBILE_SCREEN_WIDTH})  {
           display: flex;
           width: 100%;
           align-items: center;
         }
       `}>
       <div
-        role="figure"
-        tabIndex="0"
-        className="spectrum-Card"
+         tabIndex="0"
+        className="spectrum-Card spectrum-Card--sizeM"
         css={css`
           margin: 0 var(--spectrum-global-dimension-size-300);
           width: calc(var(--spectrum-global-dimension-size-4600) - var(--spectrum-global-dimension-size-800));
-          height: calc(var(--spectrum-global-dimension-size-4600) - var(--spectrum-global-dimension-size-500));
-
+          // height: calc(var(--spectrum-global-dimension-size-3600) - var(--spectrum-global-dimension-size-500));
+          height: var(--spectrum-global-dimension-size-3600);
+          
           &:hover {
             border-color: var(--spectrum-card-border-color, var(--spectrum-global-color-gray-200));
           }
@@ -151,8 +154,9 @@ const ProductCard = ({ theme = 'lightest', width = '100%', icon, heading, text, 
         <div className="spectrum-Card-footer">
           <HeroButtons
             buttons={buttons}
-            quiets={[true, false]}
-            variants={['secondary', 'primary']}
+            quiets={['outline', 'outline']}
+            styles={['outline', 'outline']}
+            variants={['secondary', 'accent']}
             css={css`
               justify-content: flex-end;
 
@@ -173,7 +177,8 @@ ProductCard.propTypes = {
   icon: PropTypes.element,
   heading: PropTypes.element,
   text: PropTypes.element,
-  buttons: PropTypes.element
+  buttons: PropTypes.element,
+  className: PropTypes.string
 };
 
 export { ProductCard };

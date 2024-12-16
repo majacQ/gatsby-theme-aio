@@ -10,67 +10,181 @@
  * governing permissions and limitations under the License.
  */
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link as GatsbyLink } from 'gatsby';
-import { isExternalLink, getExternalLinkProps } from '../../utils';
+import { isBrowser,   findSelectedTopPage,
+  findSelectedTopPageMenu,
+  rootFix,
+  rootFixPages, isExternalLink, getExternalLinkProps, MOBILE_SCREEN_WIDTH } from '../../utils';
 import { css } from '@emotion/react';
 import classNames from 'classnames';
 import '@spectrum-css/sidenav';
-import { Search } from '../Search';
 import nextId from 'react-id-generator';
+import { ChevronRight, CheckMark } from '../Icons';
+import { AnchorButton } from '../AnchorButton';
 
-const SideNav = ({ selectedPages, selectedSubPages, searchIndex }) => {
+
+const getSelectedTabIndex = (location, pages) => {
+  const pathWithRootFix = rootFix(location.pathname);
+  const pagesWithRootFix = rootFixPages(pages);
+
+  let selectedIndex = pagesWithRootFix.indexOf(
+    findSelectedTopPage(pathWithRootFix, pagesWithRootFix)
+  );
+  let tempArr = pathWithRootFix.split('/');
+  let inx = tempArr.indexOf('use-cases');
+  if (selectedIndex === -1 && inx > -1) {
+    tempArr[inx + 1] = 'agreements-and-contracts';
+    tempArr[inx + 2] = 'sales-proposals-and-contracts';
+    if (tempArr[inx + 3] == undefined) {
+      tempArr.push('');
+    }
+    let tempPathName = tempArr.join('/');
+    selectedIndex = pagesWithRootFix.indexOf(findSelectedTopPage(tempPathName, pagesWithRootFix));
+  }
+  // Assume first item is selected
+  if (selectedIndex === -1) {
+    selectedIndex = 0;
+  }
+  return selectedIndex;
+};
+
+const SideNav = ({versions, mainNavPages, selectedPages, selectedSubPages, setShowSideNav, location }) => {
+  const [expandedPages, setExpandedPages] = useState([]);
+  const [expandedMenus, setExpandedMenus] = useState([]);
+  const [sideNavClick, setSideNavClick] = useState(false);
+  const [mobileView, setMobileView] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState({});
+
   // If one page has header enabled, use header navigation type for all navigation items
-  const hasHeader = selectedSubPages.some((page) => page.header);
-  const isMultiLevel = selectedSubPages.some((page) => page?.pages?.length > 0);
+  const hasHeader = selectedSubPages.some(page => page.header);
+  const isMultiLevel = selectedSubPages.some(page => page?.pages?.length > 0);
+  const ref = useRef(null);
+  const handleClickOutside = event => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      // reset it when user did not click on the side nav.
+      setSideNavClick(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, []);
+
+
+  useEffect(() => {
+    const index = getSelectedTabIndex(location, mainNavPages);
+    const pathWithRootFix = rootFix(location.pathname);
+    setSelectedMenuItem(findSelectedTopPageMenu(pathWithRootFix, mainNavPages[index]));
+  }, [location.pathname])
+
+  useEffect(() => {
+
+    if (window.innerWidth <= 1280) {
+      setMobileView(true);
+    } else {
+      setMobileView(false);
+    }
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 1280) {
+        setMobileView(true);
+      } else {
+        setMobileView(false);
+      }
+    });
+  }, []);
 
   const renderSubtree = (pages, level) =>
     pages
-      .filter((page) => page.title && page.href)
+      .filter(page => page.title)
       .map((page, index) => {
-        const isSelected = selectedPages.find((selectedItem) => selectedItem === page);
+        const isSelected = selectedPages.find(selectedItem => selectedItem === page);
         const id = nextId();
+        const pageHref = page.href ? page.href : page.menu[0].href;
+
+        if (isSelected && !sideNavClick && !expandedPages.includes(pageHref)) {
+          setExpandedPages(pages => [...pages, pageHref]);
+        }
 
         return (
           <li
             key={index}
+            role="treeitem"
+            aria-level={level}
+            aria-expanded={page.header || expandedPages.includes(pageHref)}
             css={css`
               &:not(.is-expanded) .spectrum-SideNav {
                 display: none;
               }
+
+              &:first-of-type .spectrum-SideNav-heading {
+                margin-top: 0;
+              }
             `}
             className={classNames([
               'spectrum-SideNav-item',
-              { 'is-expanded': isSelected || page.header },
-              { 'is-selected': selectedPages[selectedPages.length - 1] === page && isSelected }
+              { 'is-expanded': page.header || expandedPages.includes(pageHref) },
+              { 'is-selected': selectedPages[selectedPages.length - 1] === page && isSelected },
             ])}>
             {page.header ? (
               <h2 className="spectrum-SideNav-heading" id={id}>
                 {page.title}
               </h2>
-            ) : isExternalLink(page.href) ? (
+            ) : isExternalLink(pageHref) ? (
               <a
-                {...getExternalLinkProps(page.href)}
-                href={page.href}
-                className="spectrum-SideNav-itemLink"
-                role="treeitem"
-                aria-level={level}>
+                {...getExternalLinkProps(pageHref)}
+                href={pageHref}
+                className="spectrum-SideNav-itemLink">
                 {page.title}
               </a>
             ) : (
-              <GatsbyLink to={page.href} className="spectrum-SideNav-itemLink" role="treeitem" aria-level={level}>
+              <GatsbyLink
+                onClick={() => {
+                  setSideNavClick(true);
+                  if (page?.pages?.length && !page.header) {
+                    if (expandedPages.includes(pageHref)) {
+                      setExpandedPages(pages => pages.filter(href => href !== pageHref));
+                    } else {
+                      setExpandedPages([...expandedPages, pageHref]);
+                    }
+                  } else {
+                    setShowSideNav(false);
+                  }
+                }}
+                to={pageHref}
+                className="spectrum-SideNav-itemLink">
                 {page.title}
+                {page.pages && page.pages.length > 0 ? (
+                  <ChevronRight
+                    css={css`
+                      position: absolute;
+                      right: 0px;
+                      width: var(--spectrum-global-dimension-size-125) !important;
+                      height: var(--spectrum-global-dimension-size-125) !important;
+                      margin-left: var(--spectrum-global-dimension-size-100);
+                      transition: transform var(--spectrum-global-animation-duration-100)
+                        ease-in-out;
+                      ${expandedPages.includes(pageHref) && `transform: rotate(90deg);`}
+                    `}
+                  />
+                ) : null}
               </GatsbyLink>
             )}
             {page.pages && (
               <ul
                 className="spectrum-SideNav"
+                role="group"
                 css={css`
                   ${level > 1
                     ? `
                     & > li > a {
-                      padding-left: calc(${level + 1} * var(--spectrum-global-dimension-size-150)) !important;
+                      padding-left: calc(${
+                        level + 1
+                      } * var(--spectrum-global-dimension-size-150)) !important;
                     }
                   `
                     : ''}
@@ -83,47 +197,172 @@ const SideNav = ({ selectedPages, selectedSubPages, searchIndex }) => {
         );
       });
 
+  const renderMenuTree = (pages, level) =>
+    pages
+      .filter(page => page.title)
+      .map((page, index) => {
+        const isSelected = selectedPages.find(selectedItem => selectedItem === page);
+        const id = nextId();
+        const pageHref = page.href ? page.href : `#${page.title.toLowerCase()}`;
+
+        if (isSelected && !sideNavClick && !expandedMenus.includes(pageHref)) {
+          setExpandedMenus(pages => [...pages, pageHref]);
+        }
+
+        return (
+          <li
+            key={index}
+            role="treeitem"
+            aria-level={level}
+            aria-expanded={page.header || expandedMenus.includes(pageHref)}
+            css={css`
+              &:not(.is-expanded) .spectrum-SideNav {
+                display: none;
+              }
+
+              &:first-of-type .spectrum-SideNav-heading {
+                margin-top: 0;
+              }
+            `}
+            className={classNames([
+              'spectrum-SideNav-item',
+              { 'is-expanded': page.header || expandedMenus.includes(pageHref) },
+              { 'is-selected': selectedPages[selectedPages.length - 1] === page && isSelected },
+            ])}>
+            {page.header ? (
+              <h2 className="spectrum-SideNav-heading" id={id}>
+                {page.title}
+              </h2>
+            ) : isExternalLink(pageHref) ? (
+              <a
+                {...getExternalLinkProps(pageHref)}
+                href={pageHref}
+                className="spectrum-SideNav-itemLink">
+
+                {page.title}
+              </a>
+            ) : (
+              <GatsbyLink
+                onClick={() => {
+                  setSideNavClick(true);
+                  if (page?.menu?.length && !page.header) {
+                    if (expandedMenus.includes(pageHref)) {
+                      setExpandedMenus(pages => pages.filter(href => href !== pageHref));
+                    } else {
+                      setExpandedMenus([...expandedMenus, pageHref]);
+                    }
+                  } else {
+                    setShowSideNav(false);
+                  }
+                }}
+                to={pageHref}
+                className="spectrum-SideNav-itemLink">
+                { selectedMenuItem === page  && <CheckMark /> }
+                {page.title}
+                {page.menu && page.menu.length > 0 ? (
+                  <ChevronRight
+                    css={css`
+                      position: absolute;
+                      right: 0px;
+                      width: var(--spectrum-global-dimension-size-125) !important;
+                      height: var(--spectrum-global-dimension-size-125) !important;
+                      margin-left: var(--spectrum-global-dimension-size-100);
+                      transition: transform var(--spectrum-global-animation-duration-100)
+                        ease-in-out;
+                      ${expandedMenus.includes(pageHref) && `transform: rotate(90deg);`}
+                    `}
+                  />
+                ) : null}
+              </GatsbyLink>
+            )}
+            {page.menu && (
+              <ul
+                className="spectrum-SideNav"
+                role="group"
+                css={css`
+                  ${level > 1
+                    ? `
+                    & > li > a {
+                      padding-left: calc(${
+                        level + 1
+                      } * var(--spectrum-global-dimension-size-150)) !important;
+                    }
+                  `
+                    : ''}
+                `}
+                {...(page.heading ? { 'aria-labelledby': id } : {})}>
+                {renderMenuTree(page.menu, level + 1)}
+              </ul>
+            )}
+          </li>
+        );
+      });
+
   return (
     <nav
+      ref={ref}
+      id="side-menu"
       role="navigation"
       aria-label="Primary"
       css={css`
         margin-top: var(--spectrum-global-dimension-size-800);
+
+        @media screen and (max-width: ${MOBILE_SCREEN_WIDTH}) {
+          margin-top: var(--spectrum-global-dimension-size-400);
+        }
       `}>
-      <Search
-        searchIndex={searchIndex}
-        css={css`
-          padding-top: var(--spectrum-global-dimension-size-400);
-          margin-left: var(--spectrum-global-dimension-size-400);
-          margin-right: var(--spectrum-global-dimension-size-400);
-          margin-bottom: var(--spectrum-global-dimension-size-200);
-        `}
-      />
       <div
-        role="tree"
         css={css`
           box-sizing: border-box;
-          padding: 0 var(--spectrum-global-dimension-size-400) var(--spectrum-global-dimension-size-400);
+          padding: var(--spectrum-global-dimension-size-400);
           overflow: auto;
-          height: calc(
-            100vh - var(--spectrum-global-dimension-size-800) - var(--spectrum-global-dimension-size-400) -
-              var(--spectrum-global-dimension-size-400)
-          );
+          height: calc(100vh - var(--spectrum-global-dimension-size-800));
         `}>
-        <ul
-          aria-label="Table of contents"
-          className={classNames('spectrum-SideNav', { 'spectrum-SideNav--multiLevel': isMultiLevel && !hasHeader })}>
-          {renderSubtree(selectedSubPages, 1)}
-        </ul>
+        {/* The section below is the alternative top menu */}
+        {mobileView && (
+          <>
+            <p>Global Navigation</p>
+            <ul
+              role="tree"
+              aria-label="Global Navigation"
+              className={classNames('spectrum-SideNav', 'spectrum-SideNav--multiLevel')}>
+              {versions && renderMenuTree([{title: 'Versions', menu: versions}], 1)}
+              {renderMenuTree(mainNavPages, 1)}
+              <AnchorButton variant="primary" href="/console" id={'consoleId'} tabIndex="0">
+                Console
+              </AnchorButton>
+            </ul>
+            {selectedSubPages.length > 0 && (
+              <>
+                <hr></hr>
+                <p>Table of contents</p>
+              </>
+            )}
+          </>
+        )}
+
+        {/* The section below is what used to be the sidenav with documentation subpages */}
+        {selectedSubPages.length > 0 && (
+          <ul
+            role="tree"
+            aria-label="Table of contents"
+            className={classNames('spectrum-SideNav', {
+              'spectrum-SideNav--multiLevel': isMultiLevel && !hasHeader,
+            })}>
+            {renderSubtree(selectedSubPages, 1)}
+          </ul>
+        )}
       </div>
     </nav>
   );
 };
 
 SideNav.propTypes = {
+  mainNavPages: PropTypes.array,
+  versions: PropTypes.array,
   selectedPages: PropTypes.array,
   selectedSubPages: PropTypes.array,
-  searchIndex: PropTypes.object
+  setShowSideNav: PropTypes.func,
 };
 
-export default SideNav;
+export { SideNav };

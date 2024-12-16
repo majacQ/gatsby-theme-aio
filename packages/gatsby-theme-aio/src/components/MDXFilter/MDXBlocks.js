@@ -17,30 +17,85 @@ import { Hero } from '../Hero';
 import { DiscoverBlock } from '../DiscoverBlock';
 import { Resources } from '../Resources';
 import { InlineAlert } from '../InlineAlert';
+import { InlineNestedAlert } from '../InlineNestedAlert';
 import { CodeBlock } from '../CodeBlock';
 import { Variant } from '../Variant';
 import { TitleBlock } from '../TitleBlock';
 import { TextBlock } from '../TextBlock';
+import { Divider } from '../Divider';
+import { Carousel } from "../Carousel";
+import { TabsBlock } from "../Tabs";
+import { WrapperComponent } from '../WrapperComponent';
+import { FormWrapperComponent } from '../FormWrapperComponent';
+import { CustomMenuBlock } from '../CustomMenuBlock';
+import { CustomIframeBlock } from '../CustomIframe';
+import { CustomCard } from '../CustomCard';
+import { MenuWrapperComponent } from '../MenuWrapperComponent';
+import { Accordion, AccordionItem } from '../Accordion';
 import { AnnouncementBlock } from '../AnnouncementBlock';
 import { SummaryBlock } from '../SummaryBlock';
 import { ProductCard } from '../ProductCard';
 import { ResourceCard } from '../ResourceCard';
+import { Media } from '../Media';
 import { JsDocParameters } from '../JsDocParameters';
 import { ProductCardGrid } from '../ProductCardGrid';
+import { OldProductCardGrid } from '../OldProductCardGrid';
+import { AnchorButtonGroup } from '../AnchorButtonGroup';
+import { DCSummaryBlock } from '../DCSummaryBlock';
+import { TeaserBlock } from "../TeaserBlock";
+import { VideoCarousel } from '../VideoCarousel';
+import { MiniResourceCard } from '../MiniResourceCard';
+import { ImageTextBlock } from '../ImageTextBlock';
+import { ListBlock } from '../ListBlock';
+import { GetCredential } from "../GetCredential";
+import { Toast } from "../Toast";
+import { PDFViewer } from '../PDFViewer';
+import { ProfileCard } from '../ProfileCard';
+import { RedoclyAPIBlock } from '../RedoclyAPIBlock';
+import { MiniProductCard } from '../MiniProductCard';
 
 export const MDXBlocks = {
   Hero,
   DiscoverBlock,
   Resources,
   InlineAlert,
+  InlineNestedAlert,
   CodeBlock: ({ theme, ...props }) => <CodeBlock theme={theme ?? globalTheme.code} {...props} />,
   Variant,
   TitleBlock,
   TextBlock,
+  Divider,
   AnnouncementBlock,
   SummaryBlock,
   ProductCard,
   ResourceCard,
+  Media,
   JsDocParameters,
-  ProductCardGrid
+  ProductCardGrid,
+  OldProductCardGrid,
+  WrapperComponent,
+  FormWrapperComponent,
+  MenuWrapperComponent,
+  CustomMenuBlock,
+  CustomIframeBlock,
+  CustomCard,
+  TeaserBlock,
+  Accordion,
+  AccordionItem,
+  TabsBlock: ({ theme, ...props }) => (
+    <TabsBlock theme={theme ?? globalTheme.code} {...props} />
+  ),
+  Carousel,
+  AnchorButtonGroup,
+  DCSummaryBlock,
+  VideoCarousel,
+  MiniResourceCard,
+  ImageTextBlock,
+  ListBlock,
+  GetCredential,
+  Toast,
+  PDFViewer,
+  ProfileCard,
+  RedoclyAPIBlock,
+  MiniProductCard
 };

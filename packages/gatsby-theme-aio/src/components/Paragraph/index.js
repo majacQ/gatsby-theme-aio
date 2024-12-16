@@ -15,7 +15,7 @@ import { css } from '@emotion/react';
 import '@spectrum-css/typography';
 
 const paragraphOverrides = `
-  margin-top: var(--spectrum-global-dimension-size-300);
+  margin-top: var(--spectrum-global-dimension-size-150);
 `;
 
 export const Paragraph = ({ children, className, css: cssOverrides, ...props }) => (
@@ -25,6 +25,10 @@ export const Paragraph = ({ children, className, css: cssOverrides, ...props }) 
     css={css`
       ${paragraphOverrides}
       ${cssOverrides}
+      
+      code {
+        word-break: break-word;
+      }
     `}>
     {children}
   </p>

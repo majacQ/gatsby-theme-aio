@@ -13,8 +13,8 @@
 import React, { useRef, useEffect, useState, createRef } from 'react';
 import { css } from '@emotion/react';
 import PropTypes from 'prop-types';
-import { Tabs, Item as TabsItem, Label as TabsItemLabel, TabsIndicator, positionIndicator } from '../Tabs';
 import { Picker } from '../Picker';
+import { Tabs, Item as TabsItem, Label as TabsItemLabel, positionIndicator,CodeTabIndicator } from '../Tabs';
 
 const CodeBlock = (props) => {
   const [tabs] = useState([]);
@@ -31,14 +31,14 @@ const CodeBlock = (props) => {
 
   useEffect(() => {
     positionSelectedTabIndicator();
-  }, [tabs]);
+  }, [positionSelectedTabIndicator,tabs]);
 
   const { theme } = props;
   const codeBlocks = [];
   const propKeys = Object.keys(props);
   const filteredCodeProps = propKeys.filter((key) => key.startsWith('code'));
   const filteredHeadingProps = propKeys.filter((key) => key.startsWith('heading'));
-  const languages = props.languages.split(',').map((language) => language.trim());
+  const languages = props.languages?.split(',').map((language) => language.trim());
 
   // A code language maps to a code content but one tab heading can have multiple codes
   const ignoredHeadings = [];
@@ -47,7 +47,7 @@ const CodeBlock = (props) => {
       codeBlocks.push({
         heading: headingI,
         code: [filteredCodeProps[i]],
-        languages: [languages[i]]
+        languages: languages && [languages[i]]
       });
 
       const headingTextI = props[headingI].props.children;
@@ -58,7 +58,7 @@ const CodeBlock = (props) => {
 
           if (headingTextI === headingTextK) {
             const block = codeBlocks.find((block) => block.heading === headingI);
-            if (block) {
+            if (block && block.languages) {
               block.code.push(filteredCodeProps[k]);
               block.languages.push(languages[k]);
               ignoredHeadings.push(headingK);
@@ -69,8 +69,17 @@ const CodeBlock = (props) => {
     }
   });
 
-  const backgroundColor = `background-color: var(--spectrum-global-color-gray-${theme === 'light' ? '200' : '50'});`;
+  const handleOnChange = (ref) => {
+    const index = tabs.filter((tab) => tab.current).indexOf(ref);
+    setSelectedIndex({
+      tab: index,
+      // Set language index to 0 when switching between tabs
+      language: 0
+    });
+    positionSelectedTabIndicator(index);
+  };
 
+  const backgroundColor = `background-color: var(--spectrum-global-color-gray-${theme === 'light' ? '200' : '50'});`;
   return (
     <div
       className={`spectrum--${theme}`}
@@ -96,30 +105,35 @@ const CodeBlock = (props) => {
             const ref = createRef();
             tabs.push(ref);
 
-            const isSelected = selectedIndex.tab === index;
-
+            // const isSelected = selectedIndex.tab === index;
             return (
               <TabsItem
                 key={index}
                 ref={ref}
-                selected={isSelected}
-                tabIndex={0}
+                selected={true}
+                id={'code-block-' + props[block.heading].props.children}
+                tabIndex={index === selectedIndex.tab ? "0":"-1"}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowRight' || e.key === 'R' || e.key === 'r') {
+                    e.currentTarget.nextSibling && e.currentTarget.nextSibling.focus();
+                  }
+                  if (e.key === 'ArrowLeft' || e.key === 'L' || e.key === 'l') {
+                    e.currentTarget.previousSibling && e.currentTarget.previousSibling.focus();
+                  }  
+                }}
                 onClick={() => {
-                  const index = tabs.filter((tab) => tab.current).indexOf(ref);
-                  setSelectedIndex({
-                    tab: index,
-                    // Set language index to 0 when switching between tabs
-                    language: 0
-                  });
-                  positionSelectedTabIndicator(index);
+                  handleOnChange(ref)
+                }}
+                onFocus={() => {
+                  handleOnChange(ref);
                 }}>
                 <TabsItemLabel>{props[block.heading].props.children}</TabsItemLabel>
               </TabsItem>
             );
           })}
-          <TabsIndicator ref={selectedTabIndicator} />
+          <CodeTabIndicator ref={selectedTabIndicator}  index={selectedIndex.tab}/>
         </Tabs>
-        <div
+        { <div
           css={css`
             display: flex;
             align-items: center;
@@ -128,14 +142,15 @@ const CodeBlock = (props) => {
           `}>
           {codeBlocks.map(
             (block, i) =>
-              selectedIndex.tab === i && (
+              selectedIndex.tab === i && codeBlocks[i].languages.length > 1 && (
                 <Picker
                   key={i}
                   isQuiet
-                  items={codeBlocks[i].languages.map((language, k) => ({
-                    title: language,
+                  items={codeBlocks[i].languages.map((language, k) => {
+                    return typeof language !== 'undefined' ?
+                  {title: language,
                     selected: k === selectedIndex.language
-                  }))}
+                  }:null})}
                   onChange={(index) => {
                     setSelectedIndex({
                       tab: selectedIndex.tab,
@@ -145,7 +160,7 @@ const CodeBlock = (props) => {
                 />
               )
           )}
-        </div>
+        </div>}
       </div>
       {codeBlocks.map((block, i) =>
         block.code.map((code, k) => (

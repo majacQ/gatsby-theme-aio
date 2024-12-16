@@ -17,7 +17,7 @@ Adobe products and technologies power them
 
 
 
-<TextBlock slots="image, heading, text, buttons" width="33%" theme="light" isCentered />
+<TextBlock slots="image, heading, text, buttons" width="33%" theme="light" />
 
 ![icon 1](images/icon1.png)
 
@@ -28,7 +28,7 @@ Build secure, scalable apps with easy integrations and we'll take care of the st
 * [Explore our APIs](../index.md#discover)
 
 
-<TextBlock slots="image, heading, text, buttons" width="33%" theme="light" isCentered />
+<TextBlock slots="image, heading, text, buttons" width="33%" theme="light" />
 
 ![icon 2](images/icon2.png)
 
@@ -39,7 +39,7 @@ UI design is made easy with [Spectrum components](https://spectrum.adobe.com) th
 * [Explore our APIs](/src/pages/index.md)
 
 
-<TextBlock slots="image, heading, text, buttons" width="33%" theme="light" isCentered />
+<TextBlock slots="image, heading, text, buttons" width="33%" theme="light" />
 
 ![icon 3](images/icon3.png)
 
@@ -47,7 +47,7 @@ UI design is made easy with [Spectrum components](https://spectrum.adobe.com) th
 
 Get API authorization and user access control out of the box.
 
-* [Explore our APIs](https://adobe.io)
+* [Explore our APIs](https://adobe.io?aio_internal)
 
 
 <TextBlock slots="heading, text, video" isCentered />
@@ -56,8 +56,17 @@ Get API authorization and user access control out of the box.
 
 Everything you need to build a custom cloud app to meet your business needs
 
-[Firefly video introduction](https://www.youtube.com/watch?v=mkgpeWbHrjA)
+<https://www.youtube.com/watch?v=mkgpeWbHrjA>
 
+
+
+<TextBlock slots="video, heading, text" />
+
+<https://images-tv.adobe.com/mpcv3/5158/aa393134-7cf7-4ebb-bfd0-1ced95237d20_1615916599.854x480at800_h264.mp4>
+
+### Introducing Project Firefly
+
+Everything you need to build a custom cloud app to meet your business needs
 
 
 
@@ -96,6 +105,34 @@ Submit your custom app for review. Admins can view, test and approve, and publis
 
 * ![Adobe](images/adobe.png) [Adobe Exchange](https://exchange.adobe.com/)  
 * ![Adobe Experience Cloud](images/adobe-experiencecloud.png) [Adobe Experience Cloud](https://experiencecloud.adobe.com/)  
+
+
+<TextBlock slots="heading, text" width="25%" theme="light" />
+
+### Heading
+
+Text
+
+
+<TextBlock slots="heading, text" width="25%" theme="light" />
+
+### Heading
+
+Text
+
+
+<TextBlock slots="heading, text" width="25%" theme="light" />
+
+### Heading
+
+Text
+
+
+<TextBlock slots="heading, text" width="25%" theme="light" />
+
+### Heading
+
+Text
 
 
 

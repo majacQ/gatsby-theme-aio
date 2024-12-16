@@ -12,15 +12,13 @@
 
 import React from 'react';
 import { GatsbyLink } from '../GatsbyLink';
-import { getExternalLinkProps, isExternalLink, gdocsRelativeLinkFix } from '../../utils';
+import { getExternalLinkProps, isExternalLink } from '../../utils';
 import { Link } from '../Link';
 import PropTypes from 'prop-types';
 
-const AnchorLink = ({ href, ...props }) => {
-  href = gdocsRelativeLinkFix(href);
-
+const AnchorLink = ({ href, variant = 'primary', ...props }) => {
   return (
-    <Link isQuiet={true}>
+    <Link isQuiet={true} variant={variant}>
       {isExternalLink(href) ? (
         <a href={href} {...getExternalLinkProps(href)} {...props} />
       ) : (
@@ -31,7 +29,8 @@ const AnchorLink = ({ href, ...props }) => {
 };
 
 AnchorLink.propTypes = {
-  href: PropTypes.string
+  href: PropTypes.string,
+  variant: PropTypes.oneOf(['primary', 'secondary'])
 };
 
 export { AnchorLink };

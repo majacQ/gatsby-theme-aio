@@ -10,96 +10,242 @@
  * governing permissions and limitations under the License.
  */
 
-const webpack = require('webpack');
+const { ProvidePlugin } = require('webpack');
 
-exports.onCreateWebpackConfig = ({ actions }) => {
+exports.onCreateWebpackConfig = ({ stage, loaders, actions }) => {
   actions.setWebpackConfig({
     resolve: {
       fallback: {
+        fs: false,
+        path: require.resolve('path-browserify'),
         https: require.resolve('https-browserify'),
-        http: require.resolve('stream-http')
-      }
+        http: require.resolve('stream-http'),
+        tty: require.resolve('tty-browserify'),
+        os: require.resolve('os-browserify/browser'),
+      },
     },
     plugins: [
-      new webpack.ProvidePlugin({
+      new ProvidePlugin({
         process: 'process/browser',
-        Buffer: ['buffer', 'Buffer']
-      })
-    ]
+        Buffer: ['buffer', 'Buffer'],
+      }),
+    ],
   });
+  if(stage === 'build-html'){
+    actions.setWebpackConfig({
+      module: {
+        rules: [{
+          test: /lottie/,
+          use: loaders.null()
+        }]
+      }
+    });
+  }
 };
 
 exports.createSchemaCustomization = ({ actions }) => {
-  const { createTypes } = actions;
-  const typeDefs = `
-    type Link {
-      title: String
-      path: String
-    }
-    
-    type Menu {
+  const { createTypes } = actions; // define custom types
+
+  createTypes(`
+      type SiteSiteMetadata implements Node {
       title: String
       description: String
-      path: String
+      home: Home
+      pages: [TopPage]
+      subPages: [SubPage]
+      versions: [Version]
+      docs: Link
+      githubIssue: GitHubIssue
+      salesFAQMenus: [salesFAQMenus]
+      techSupportFAQMenus: [techSupportFAQMenus]
+      subMenuPages: [subMenuPages]
+      allFile: allFile
     }
     
+    type subMenuPages {
+      path: String
+      title: String
+      icon: String
+      pages: [MenuPages] 
+    }
+    
+    type MenuPages {
+      path: String
+      title: String
+    }
+
+    type salesFAQMenus {
+      path: String
+      title: String
+    }
+    
+    type techSupportFAQMenus {
+      path: String
+      title: String
+    }
+    
+    type Home {
+      title: String
+      path: String
+      hidden: Boolean
+    }
+
     type TopPage {
       title: String
       path: String
       menu: [Menu]
     }
-    
-    type Version {
+
+    type Menu {
       title: String
+      description: String
       path: String
-      selected: Boolean
     }
-    
-    type SiteSiteMetadata {
-      home: Link
-      pages: [TopPage]
-      subPages: [SubPage]
-      versions: [Version]
-      docs: Link
-    }
-    
+
     type SubPage {
       title: String
       path: String
       header: Boolean
       pages: [NestedSubPage1]
     }
-    
+
     type NestedSubPage1 {
       title: String
       path: String
       pages: [NestedSubPage2]
     }
-    
+
     type NestedSubPage2 {
       title: String
       path: String
       pages: [NestedSubPage3]
     }
-    
+
     type NestedSubPage3 {
       title: String
       path: String
       pages: [NestedSubPage4]
     }
-    
+
     type NestedSubPage4 {
       title: String
       path: String
       pages: [NestedSubPage5]
     }
-    
+
     type NestedSubPage5 {
       title: String
       path: String
       pages: [Link]
     }
-  `;
 
-  createTypes(typeDefs);
+    type Version {
+      title: String
+      path: String
+      selected: Boolean
+    }
+    
+    type Link {
+      title: String
+      path: String
+    }
+    
+    type GitHubIssue{
+      removeLogIssue: Boolean
+    }
+
+    type allFile {
+      edges: Node
+    }
+  `);
+};
+
+exports.createResolvers = ({ createResolvers }) => {
+  const resolvers = {
+    File: {
+      isNew: {
+        type: 'Boolean',
+        resolve: source => source.isNew,
+      },
+      howRecent: {
+        type: 'Int',
+        resolve: source => source.howRecent || 0,
+      },
+      icon: {
+        type: 'String',
+        resolve: source => source.icon || '',
+      },
+      path: {
+        type: 'String',
+        resolve: source => source.path || '',
+      },
+    },
+    MdxFrontmatter: {
+      title: {
+        type: 'String',
+        resolve: source => source.title,
+      },
+      keywords: {
+        type: '[String]',
+        resolve: source => source.keywords,
+      },
+      category: {
+        type: 'String',
+        resolve: source => source.category,
+      },
+      description: {
+        type: 'String',
+        resolve: source => source.description,
+      },
+      contributors: {
+        type: '[String]',
+        resolve: source => source.contributors,
+      },
+      contributor_link: {
+        type: 'String',
+        resolve: source => source.contributor_link,
+      },
+      contributor_name: {
+        type: 'String',
+        resolve: source => source.contributor_name,
+      },
+      edition: {
+        type: 'String',
+        resolve: source => source.edition,
+      },
+      openAPISpec: {
+        type: 'String',
+        resolve: source => source.openAPISpec,
+      },
+      frameSrc: {
+        type: 'String',
+        resolve: source => source.frameSrc,
+      },
+      frameHeight: {
+        type: 'String',
+        resolve: source => source.frameHeight,
+      },
+      layout: {
+        type: 'String',
+        resolve: source => source.layout,
+      },
+      jsDoc: {
+        type: 'Boolean',
+        resolve: source => source.jsDoc,
+      },
+      hideBreadcrumbNav: {
+        type: 'Boolean',
+        resolve: source => source.hideBreadcrumbNav,
+      },
+      featured: {
+        type: 'Boolean',
+        resolve: source => source.featured || false,
+      },
+      noIndex: {
+        type: 'Boolean',
+        resolve: source => source.noIndex || false,
+      },
+    },
+  };
+  createResolvers(resolvers);
 };

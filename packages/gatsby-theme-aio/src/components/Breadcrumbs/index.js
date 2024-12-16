@@ -12,39 +12,29 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { css } from '@emotion/react';
 import { GatsbyLink } from '../GatsbyLink';
 import '@spectrum-css/breadcrumb';
 import { ChevronRightSmall } from '../Icons';
 
-const Breadcrumbs = ({ selectedTopPage, selectedSubPages }) => (
+const Breadcrumbs = ({ pages }) => (
   <nav aria-label="Breadcrumb" role="navigation">
-    <ul
-      className="spectrum-Breadcrumbs spectrum-Breadcrumbs--compact"
-      css={css`
-        display: block;
-      `}>
-      <li className="spectrum-Breadcrumbs-item">
-        <GatsbyLink className="spectrum-Breadcrumbs-itemLink" to={selectedTopPage.href}>
-          {selectedTopPage.title}
-        </GatsbyLink>
-        <ChevronRightSmall className="spectrum-Breadcrumbs-itemSeparator" />
-      </li>
-      {selectedSubPages.map((page, index) => (
-        <li className="spectrum-Breadcrumbs-item" key={index}>
-          <GatsbyLink className="spectrum-Breadcrumbs-itemLink" to={page.href}>
-            {page.title}
-          </GatsbyLink>
-          <ChevronRightSmall className="spectrum-Breadcrumbs-itemSeparator" />
-        </li>
-      ))}
+    <ul className="spectrum-Breadcrumbs spectrum-Breadcrumbs--sizeM">
+      {pages.map((page, index) =>
+        page && !page.header ? (
+          <li className="spectrum-Breadcrumbs-item spectrum-Breadcrumbs--sizeM" key={index}>
+            <GatsbyLink className="spectrum-Breadcrumbs-itemLink" to={page.href}>
+              {page.title}
+            </GatsbyLink>
+            <ChevronRightSmall className="spectrum-Breadcrumbs-itemSeparator" />
+          </li>
+        ) : null
+      )}
     </ul>
   </nav>
 );
 
 Breadcrumbs.propTypes = {
-  selectedTopPage: PropTypes.object,
-  selectedSubPages: PropTypes.array
+  pages: PropTypes.array
 };
 
 export { Breadcrumbs };

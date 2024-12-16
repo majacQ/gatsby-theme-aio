@@ -12,12 +12,14 @@
 
 import React, { cloneElement } from 'react';
 import { css } from '@emotion/react';
-import { HeroImage, HeroButtons } from '../Hero';
+import { HeroButtons, HeroImage } from '../Hero';
 import { TABLET_SCREEN_WIDTH } from '../../utils';
 import '@spectrum-css/typography';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 const SummaryBlock = ({
+  className,
   background = 'var(--spectrum-global-color-gray-100)',
   theme = 'dark',
   heading,
@@ -26,7 +28,7 @@ const SummaryBlock = ({
   buttons
 }) => (
   <section
-    className={`spectrum--${theme}`}
+    className={classNames(className, `spectrum--${theme}`)}
     css={css`
       height: calc(var(--spectrum-global-dimension-size-4600) - var(--spectrum-global-dimension-size-225));
       background-color: ${background};
@@ -49,7 +51,7 @@ const SummaryBlock = ({
         left: 0;
         display: flex;
         flex-direction: column;
-        align-items: left;
+        align-items: flex-start;
         justify-content: center;
         text-align: left;
 
@@ -79,7 +81,7 @@ const SummaryBlock = ({
           `
         })}
 
-      <HeroButtons buttons={buttons} quiets={[false, true]} variants={['overBackground', 'overBackground']} />
+      <HeroButtons buttons={buttons} styles={['fill', 'outline']} variants={['accent', 'primary']} />
     </div>
   </section>
 );

@@ -10,8 +10,14 @@
  * governing permissions and limitations under the License.
  */
 
+const { createProxyMiddleware } = require("http-proxy-middleware");
+
 module.exports = {
+  pathPrefix: process.env.PATH_PREFIX || '/example/',
   siteMetadata: {
+    docs: {
+      title: 'Get Credential',
+    },
     home: {
       title: 'Home',
       path: '/home/?plop=plip#foo'
@@ -32,8 +38,29 @@ module.exports = {
         path: 'index.md'
       },
       {
-        title: 'Guides',
-        path: '/guides/index.md'
+        title: 'Get API Key credential',
+        path: "/getCredential"
+      },
+      {
+        title: 'Get OAuth S2S credential',
+        path: "/get-credential-oauth"
+      },
+      {
+        title: 'Docs',
+        menu: [
+          {
+            title: 'Guides',
+            path: '/guides/index.md'
+          },
+          {
+            title: 'Guides without breadcrumbs',
+            path: '/guides/no-breadcrumbs.md'
+          },
+          {
+            title: 'Guides without hero breadcrumbs',
+            path: '/guides/no-hero-breadcrumb.md'
+          }
+        ]
       },
       {
         title: 'APIs',
@@ -43,11 +70,6 @@ module.exports = {
             description: 'This is the OpenAPI page of Adobe Analytics',
             path: '/api/index.md/'
           },
-          // {
-          //   title: 'Petstore API',
-          //   description: 'This is the OpenAPI page of the swagger Petstore API stored in static files',
-          //   path: '/api/petstore/'
-          // },
           {
             title: 'Analytics Swagger file',
             description: 'External link',
@@ -73,12 +95,37 @@ module.exports = {
         ]
       },
       {
+        title: 'Community',
+        menu: [
+          {
+            title: 'Tech Blog',
+            path: 'https://medium.com/adobetech'
+          },
+          {
+            title: 'Open Source at Adobe',
+            path: '/open'
+          },
+          {
+            title: 'Adobe on GitHub',
+            path: 'https://github.com/adobe'
+          },
+          {
+            title: 'Adobe Developer Support',
+            path: '/developer-support'
+          },
+          {
+            title: 'Community Forums',
+            path: 'https://community.adobe.com/'
+          }
+        ]
+      },
+      {
         title: 'CC',
         path: '/creative_cloud/'
       },
       {
         title: 'Ext',
-        path: 'https://adobe.io'
+        path: 'https://adobe.io?aio_internal'
       },
       {
         title: 'Project Firefly',
@@ -105,6 +152,10 @@ module.exports = {
           {
             title: 'Creating an OAuth Client',
             path: '/guides/creating_oauth_client/index.md'
+          },
+          {
+            title: 'Guide with no breadcrumbs',
+            path: '/guides/no-breadcrumbs.md'
           }
         ]
       },
@@ -114,7 +165,7 @@ module.exports = {
         pages: [
           {
             title: 'Overview',
-            path: '/guides/reporting_api/'
+            path: '/guides/reporting_api/overview.md'
           },
           {
             title: 'Reporting with breakdowns',
@@ -166,7 +217,13 @@ module.exports = {
       },
       {
         title: 'Calculated Metrics API',
-        path: '/guides/Calculated Metrics API/'
+        path: '/guides/Calculated Metrics API/',
+        pages: [
+          {
+            title: 'External',
+            path: 'https://adobe.io'
+          }
+        ]
       },
       {
         title: 'Overview',
@@ -202,10 +259,31 @@ module.exports = {
           }
         ]
       }
+
     ]
   },
   plugins: [
     `@adobe/gatsby-theme-aio`
   ],
-  pathPrefix: '/example'
+  developMiddleware: app => {
+    app.use(
+      "/console/api",
+      createProxyMiddleware({
+        target: "https://developer-stage.adobe.com/console/api",
+        secure: false,
+        changeOrigin: true,
+      })
+    );
+    app.use("/templates", createProxyMiddleware({
+      target: "https://developer-stage.adobe.com/templates",
+      secure: false,
+      changeOrigin: true,
+    }));
+
+    app.use("/ims", createProxyMiddleware({
+      target: "https://ims-na1-stg1.adobelogin.com/ims",
+      secure: false,
+      changeOrigin: true,
+    }));
+  },
 };

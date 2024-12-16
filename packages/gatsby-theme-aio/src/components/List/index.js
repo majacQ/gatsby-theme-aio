@@ -14,12 +14,20 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import '@spectrum-css/typography';
+import {css} from "@emotion/react";
 
-const List = ({ children, elementType = 'ul', className, ...props }) => {
+const List = ({ children, elementType = 'ul', css: cssOverrides, className, ...props }) => {
   const Element = elementType;
-
+  const listOverrides = `
+  margin-top: var(--spectrum-global-dimension-size-150);
+`;
   return (
-    <Element {...props} className={classNames(className, 'spectrum-Body spectrum-Body--sizeM')}>
+    <Element {...props} className={classNames(className, 'spectrum-Body spectrum-Body--sizeM')}
+      css={css`
+      ${listOverrides}
+      ${cssOverrides}
+      
+    `}>
       {children}
     </Element>
   );

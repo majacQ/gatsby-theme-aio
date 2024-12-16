@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { css } from '@emotion/react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -18,22 +18,16 @@ import nextId from 'react-id-generator';
 import { GatsbyLink } from '../GatsbyLink';
 import '@spectrum-css/menu';
 import { CheckMark } from '../Icons';
-import { getExternalLinkProps } from '../../utils';
 
-const Menu = ({ children }) => {
+const Menu = forwardRef(({ children, ...props }, ref) => {
   return (
-    <ul
-      className="spectrum-Menu"
-      role="menu"
-      css={css`
-        display: block;
-      `}>
+    <ul ref={ref} className="spectrum-Menu" role="menubar" {...props}>
       {children}
     </ul>
   );
-};
+});
 
-const Item = ({ children, isDivider = false, isHighlighted, isSelected, href = '', ...props }) => {
+const Item = ({ children, isDivider = false, isHighlighted, isSelected, href = '', isHeightUnset, ...props }) => {
   const Element = href ? GatsbyLink : 'li';
 
   return isDivider ? (
@@ -42,15 +36,35 @@ const Item = ({ children, isDivider = false, isHighlighted, isSelected, href = '
     <Element
       className={classNames('spectrum-Menu-item', { 'is-open': isHighlighted }, { 'is-selected': isSelected })}
       to={href}
-      {...getExternalLinkProps(href)}
       role="menuitem"
       tabIndex="0"
       css={css`
         text-align: left;
       `}
       {...props}>
+      <div css={css`display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    overflow: hidden;
+    align-self: start;
+    ${ isHeightUnset && !isHeightUnset ? `margin-top: var(--spectrum-global-dimension-size-50) !important` : ""}
+}`}>
+        <div css={css`
+          width: 20px !important;
+         ${ isHeightUnset ? "margin-top: 8px;" : "height: 15px !important; margin-top: 4px;" }
+         padding-right: 5px;
+         overflow: hidden;
+        `}>
+          <CheckMark
+            className="spectrum-Menu-checkmark spectrum-Menu-itemIcon"
+            css={css`
+             display: ${isSelected ? "block" : "none"} ;
+             color:  var(--spectrum-alias-icon-color-selected) !important;
+            `}
+          />
+          </div>
+      </div>
       <span className="spectrum-Menu-itemLabel">{children}</span>
-      <CheckMark className="spectrum-Menu-checkmark spectrum-Menu-itemIcon" />
     </Element>
   );
 };

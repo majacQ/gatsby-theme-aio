@@ -16,13 +16,15 @@ import '@spectrum-css/typography';
 import { AnchorButton } from '../AnchorButton';
 import PropTypes from 'prop-types';
 import { getElementChild, TABLET_SCREEN_WIDTH } from '../../utils';
+import classNames from 'classnames';
 
-const AnnouncementBlock = ({ heading, text, button, theme = 'light' }) => {
+const AnnouncementBlock = ({ className, heading, text, button, theme = 'light', variantsTypePrimary='primary', variantStyleOutline = "outline" }) => {
+
   const link = getElementChild(button);
 
   return (
     <section
-      className={`spectrum--${theme}`}
+      className={classNames(className, `spectrum--${theme}`)}
       css={css`
         display: flex;
         background: var(--spectrum-global-color-gray-100);
@@ -64,8 +66,9 @@ const AnnouncementBlock = ({ heading, text, button, theme = 'light' }) => {
             css={css`
               margin-top: var(--spectrum-global-dimension-size-200);
             `}>
-            <AnchorButton href={link.props.href} variant="primary">
-              {link.props.children}
+            <AnchorButton href={link.props.href}  style={variantStyleOutline}
+              variant={variantsTypePrimary}>
+              <span class="spectrum-Button-label">{link.props.children}</span>
             </AnchorButton>
           </div>
         )}

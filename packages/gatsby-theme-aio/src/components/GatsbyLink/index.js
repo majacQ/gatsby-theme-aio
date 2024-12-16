@@ -12,25 +12,55 @@
 
 import React, { forwardRef, useContext } from 'react';
 import { Link, withPrefix } from 'gatsby';
-import { isInternalLink, isExternalLink, fixInternalLink, trailingSlashFix } from '../../utils';
+import { fixInternalLink, isExternalLink, isInternalLink, trailingSlashFix } from '../../utils';
 import PropTypes from 'prop-types';
 import Context from '../Context';
+import classNames from 'classnames';
 
-const GatsbyLink = forwardRef(({ to, ...props }, ref) => {
+const GatsbyLink = forwardRef(({ className, style, variant, to, ...props }, ref) => {
+  if (props.role === 'button') {
+    className = classNames([className, `spectrum-Button--${variant}`, `spectrum-Button--${style}`]);
+  }
+
   if (isExternalLink(to)) {
-    return <a href={to} ref={ref} {...props} />;
+    return <a className={classNames(className)} href={to} ref={ref} {...props} />;
   }
 
   const { location, allSitePage, pathPrefix } = useContext(Context);
   const pages = allSitePage.nodes.map((page) => withPrefix(page.path));
 
   if (isInternalLink(to, location, pages)) {
-    return <Link to={fixInternalLink(to, location, pathPrefix)} ref={ref} {...props} />;
+    return (
+      <Link className={classNames(className)} to={fixInternalLink(to, location, pathPrefix)} ref={ref} {...props} />
+    );
+  }
+  // Support non folder structured links
+  const fixedTo = `../${to}`;
+
+  if (isInternalLink(fixedTo, location, pages)) {
+    return (
+      <Link
+        className={classNames(className)}
+        to={fixInternalLink(fixedTo, location, pathPrefix)}
+        ref={ref}
+        {...props}
+      />
+    );
   }
 
+  // Support external relative links and linked files
+  // Not going to replace the path if it's for mobile sdk path of 'client-sdks' as their structure is setup differently.
   return (
     <a
-      href={pathPrefix && to && to.startsWith(trailingSlashFix(pathPrefix)) ? to.replace(pathPrefix, '') : to}
+      className={classNames(className)}
+      href={
+        to &&
+        !new URL(to, 'https://example.com').pathname.split('.')[1] &&
+        pathPrefix &&
+        to.startsWith(trailingSlashFix(pathPrefix)) && !to.startsWith("/client-sdks")
+          ? to.replace(pathPrefix, '')
+          : to
+      }
       ref={ref}
       {...props}
     />
@@ -38,6 +68,8 @@ const GatsbyLink = forwardRef(({ to, ...props }, ref) => {
 });
 
 GatsbyLink.propTypes = {
+  variant: PropTypes.oneOf(['accent', 'primary', 'secondary', 'negative']),
+  style: PropTypes.oneOf(['fill', 'outline']),
   to: PropTypes.string
 };
 

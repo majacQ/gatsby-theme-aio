@@ -21,6 +21,25 @@ import '@adobe/prism-adobe';
 import { ActionButton } from '../ActionButton';
 import PropTypes from 'prop-types';
 
+import Prism from "prism-react-renderer/prism";
+
+(typeof global !== "undefined" ? global : window).Prism = Prism;
+
+const getLoader = require('prismjs/dependencies');
+const components = require('prismjs/components');
+
+const componentsToLoad = ['java', 'php', 'csharp', 'kotlin', 'swift', 'bash', 'sql', 'typescript', 'objectivec', 'yaml', 'json'];
+const loadedComponents = ['clike', 'javascript'];
+
+const loader = getLoader(components, componentsToLoad, loadedComponents);
+try{
+  loader.load(id => {
+    require(`prismjs/components/prism-${id}.min.js`);
+  });
+} catch (e) {
+  console.log(e);
+}
+
 const openTooltip = (setIsTooltipOpen) => {
   setIsTooltipOpen(true);
   setTimeout(() => {
@@ -42,7 +61,8 @@ const Code = ({ children, className = '', theme }) => {
   return (
     <Highlight {...defaultProps} code={children} language={language}>
       {({ className, tokens, getLineProps, getTokenProps }) => {
-        const lines = tokens.slice(0, -1);
+        const isEmptyItem = (token) => token && token.length === 1 && token[0].empty;
+        const lines = isEmptyItem(tokens[tokens.length - 1]) ? tokens.slice(0, -1) : tokens;
         const isMultiLine = lines.length > 1;
         const textarea = createRef();
 
@@ -51,7 +71,23 @@ const Code = ({ children, className = '', theme }) => {
             className={`spectrum--${theme}`}
             css={css`
               position: relative;
+              max-width: calc(100vw - var(--spectrum-global-dimension-size-800));
             `}>
+            <ActionButton
+              aria-describedby={tooltipId}
+              css={css`
+                position: absolute;
+                right: 10px;
+                top: 0px;
+                border-color: var(--spectrum-actionbutton-m-border-color,var(--spectrum-alias-border-color)) !important;
+                color: var(--spectrum-actionbutton-m-text-color,var(--spectrum-alias-text-color)) !important;
+                padding: var(--spectrum-global-dimension-size-65)    
+                `}
+              onClick={() => {
+                copy(textarea, document, setIsTooltipOpen);
+              }}>
+              Copy
+            </ActionButton>
             <div
               css={css`
                 position: absolute;
@@ -70,13 +106,6 @@ const Code = ({ children, className = '', theme }) => {
                 ref={textarea}
                 value={children}
               />
-              <ActionButton
-                aria-describedby={tooltipId}
-                onClick={() => {
-                  copy(textarea, document, setIsTooltipOpen);
-                }}>
-                Copy
-              </ActionButton>
               <span
                 role="tooltip"
                 id={tooltipId}
@@ -95,8 +124,8 @@ const Code = ({ children, className = '', theme }) => {
                 <span className="spectrum-Tooltip-tip" />
               </span>
             </div>
-            <pre className={classNames(className, 'spectrum-Code spectrum-Code--sizeM')}>
-              {tokens.slice(0, -1).map((line, i) => {
+            <pre css={css`padding-top: 30px !important;`} className={classNames(className, 'spectrum-Code spectrum-Code--sizeM')}>
+              {lines.map((line, i) => {
                 const { style: lineStyles, ...lineProps } = getLineProps({ line, key: i });
 
                 return (
@@ -106,15 +135,17 @@ const Code = ({ children, className = '', theme }) => {
                       display: table-row;
                     `}>
                     {isMultiLine && (
-                      <span
+                      <span data-pseudo-content={i+1}
                         css={css`
                           display: table-cell;
                           color: var(--spectrum-global-color-gray-500);
                           text-align: left;
                           padding-right: var(--spectrum-global-dimension-size-200);
                           user-select: none;
+                          &::before {
+                            content: attr(data-pseudo-content);
+                          }
                         `}>
-                        {i + 1}
                       </span>
                     )}
                     <span

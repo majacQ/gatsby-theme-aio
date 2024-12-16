@@ -27,9 +27,10 @@ const readTableOfContents = (headings, setTableOfContentsItems) => {
   ];
 
   headings.forEach((heading, index) => {
-    if (heading.previousElementSibling && heading.previousElementSibling.id) {
-      const title = heading.textContent.trim().slice(0, -1);
-      const url = heading.querySelector('a').getAttribute('href');
+    const anchor = heading.querySelector('a');
+    if (anchor && heading.previousElementSibling && heading.previousElementSibling.id) {
+      const title = heading.textContent;
+      const url = anchor.getAttribute('href');
 
       if (heading.tagName === 'H2') {
         if (index === 0) {
@@ -94,6 +95,11 @@ const OnThisPage = ({ tableOfContents }) => {
         readTableOfContents(headings, setTableOfContentsItems);
       }
     }
+    const codeBlockHeadings = document.querySelectorAll('[id*="code-block-"]');
+    let codeHeadings = [];
+    codeBlockHeadings && codeBlockHeadings.forEach(codeBlockHeading => { codeHeadings.push(codeBlockHeading.children[0].textContent)});
+    let ignoreCodeBlockHeadings = tableOfContentsItems?.filter(item => codeHeadings && !codeHeadings?.includes(item.title));
+    setTableOfContentsItems(ignoreCodeBlockHeadings);
   }, []);
 
   // Highlights the visible sections on the page based on scrolling

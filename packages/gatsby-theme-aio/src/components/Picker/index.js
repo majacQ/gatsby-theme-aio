@@ -18,6 +18,8 @@ import { ChevronDown } from '../Icons';
 import { Popover } from '../Popover';
 import { Menu, Item } from '../Menu';
 import '@spectrum-css/picker';
+import { getExternalLinkProps } from '../../utils';
+import { css } from '@emotion/react';
 
 const Picker = ({ label, isQuiet, items, onChange, ...props }) => {
   const popover = useRef(null);
@@ -44,6 +46,10 @@ const Picker = ({ label, isQuiet, items, onChange, ...props }) => {
     }
   }, [options]);
 
+  useEffect(() => {
+    setOptions(items);
+  }, [items]);
+
   return (
     <div>
       <button
@@ -63,7 +69,7 @@ const Picker = ({ label, isQuiet, items, onChange, ...props }) => {
           setOpenMenu((openMenu) => !openMenu);
         }}>
         <span className={classNames('spectrum-Picker-label', { 'is-placeholder': label })}>
-          {label || options.find((option) => option.selected)?.title || options[0].title}
+          {label || options.find((option) => option.selected)?.title || options[0]?.title}
         </span>
         <ChevronDown className="spectrum-Picker-menuIcon" />
       </button>
@@ -84,10 +90,18 @@ const Picker = ({ label, isQuiet, items, onChange, ...props }) => {
                   setOpenMenu(false);
                   onChange && onChange(i);
                 }}
-                isHighlighted={(!hasSelection && i === 0) || option.selected}
-                isSelected={option.selected}
-                href={option.href}>
-                {option.title}
+                isHighlighted={(!hasSelection && i === 0) || option?.selected}
+                isSelected={option?.selected}
+                href={option?.href}
+                {...getExternalLinkProps(option?.href)}>
+                <div>
+                  <p className='spectrum-Body spectrum-Body--sizeS' css={css`
+                    margin-top:6px;
+                  `}>{option?.title}</p>
+                  <p className='spectrum-Body spectrum-Body--sizeXS' css={css`
+                    margin-top:1px;
+                  `}>{option?.type}</p>
+                </div>
               </Item>
             );
           })}
